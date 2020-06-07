@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    environment: 
+      JAVA_OPTS: "-Dorg.apache.commons.jelly.tags.fmt.timeZone=America/New_York"
+      JENKINS_SLAVE_AGENT_PORT: "50000"
+    ports:
+      - 8080:8080
+      - 5000:5000
+      - 443:443
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - /home/ubuntu/Jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/bin/docker:/usr/local/bin/docker

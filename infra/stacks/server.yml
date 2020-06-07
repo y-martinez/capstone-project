@@ -1,0 +1,131 @@
+Description: >
+  Ybrahin Martinez - Server with Jenkins
+
+Parameters:
+
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+
+  InstanceType:
+    Description: The instance type to use for the bastion host
+    Default: t3.micro
+    Type: String
+    
+  InstanceAMI:
+    Type: String
+    Default: ami-003634241a8fcdec0
+    Description: AMI of a bastion host instance to use
+
+  SSHLocation:
+    Description: Network allowed to connect using ssh to bastion host in public subnet.
+    Default: 0.0.0.0/0
+    Type: String
+
+  KeyName:
+    Description: Keypair for Linux host
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: udagramBastionKey
+
+Resources:
+
+  HostSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh connection to host (basic Jenkins security group)
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: name
+          Value: !Sub ${EnvironmentName} SecGroup Jenkins Host
+
+  EIPHost:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+
+  InstanceHostEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref InstanceAMI
+      KeyName: !Ref KeyName
+      IamInstanceProfile:
+        Fn::ImportValue:
+          !Sub ${EnvironmentName}-InstanceProfile
+      SecurityGroupIds:
+        - !Ref HostSecGroup
+      InstanceType: !Ref InstanceType
+      SubnetId:
+        Fn::ImportValue:
+          !Sub ${EnvironmentName}-PUBLIC1-SN
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sdk"
+        Ebs:
+          VolumeSize: '10'
+      UserData:
+        Fn::Base64: 
+          Fn::Sub:
+            - |
+              #!/bin/bash
+              
+              echo "Installing docker and its dependencies"
+              apt-get update
+              apt-get install -y apt-transport-https ca-certificates curl software-properties-common unzip tidy
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+              add-apt-repository \
+                "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+                $(lsb_release -cs) \
+                stable"
+              apt-get update
+              apt-get install -y docker-ce docker-ce-cli containerd.io 
+              usermod -aG docker ubuntu
+              systemctl service docker start
+              
+              echo "Installing docker-compose"
+              curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+              
+              echo "Installing Jenkins with docker-compose"
+              curl -L https://raw.githubusercontent.com/y-martinez/static-website-aws-jenkins/master/docker-compose.yml -o docker-compose.yml
+
+              mkdir /home/ubuntu/Jenkins
+              sudo chown -R ubuntu:ubuntu /home/ubuntu/Jenkins
+              docker-compose up -d
+
+              echo "Exporting the default Jenkins' password"
+              #cat /home/ubuntu/Jenkins/secrets/initialAdminPassword
+              echo "Installing aws-cli"
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip -qq awscliv2.zip
+              ./aws/install
+              instance_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+
+              aws ec2 associate-address --instance-id $instance_id --allow-reassociation  --region ${AWS::Region} --allocation-id ${EIPAllocation}
+
+            - EIPAllocation: !GetAtt EIPHost.AllocationId
+
+Outputs:
+
+  HostPublicIPAddress:
+    Description: Host public IP
+    Value: !Ref EIPHost
+    Export:
+      Name: !Sub ${EnvironmentName}-PUBLIC-IP
+
