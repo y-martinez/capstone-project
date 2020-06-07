@@ -1,0 +1,17 @@
+{%extends 'base.html'%}
+
+{%block title%}Result{%endblock%}
+
+{%block content%}
+
+    <h1>Results</h1>
+
+    <div>
+        <img style="max-width: 316px;max-height: 336px;" src="{{out.img}}" alt="Image analized">
+    </div>
+
+    <div>
+        <pre>{{out.analized}}</pre>
+    </div>
+
+{%endblock%}
