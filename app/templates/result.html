@@ -4,14 +4,73 @@
 
 {%block content%}
 
+    
     <h1>Results</h1>
 
     <div>
-        <img style="max-width: 316px;max-height: 336px;" src="{{out.img}}" alt="Image analized">
+        <img style="max-width: 316px;max-height: 336px;" src="{{img}}" alt="Image analized">
     </div>
 
     <div>
-        <pre>{{out.analized}}</pre>
+        <table class="tg">
+            <thead>
+                <tr>
+                    <th>Face #</th>
+                    <th>Feature</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for face in faces_analized %}
+                    <tr>
+                        <td rowspan="11">Face</td>
+                        <td>Face</td>
+                        <td>{{face['Face']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Age</td>
+                        <td>{{face['Age']}}</td>
+                    </tr>
+                    <tr>
+                        <td>CALM</td>
+                        <td>{{face['CALM']}}</td>
+                    </tr>
+                    <tr>
+                        <td>HAPPY</td>
+                        <td>{{face['HAPPY']}}</td>
+                    </tr>
+                    <tr>
+                        <td>ANGRY</td>
+                        <td>{{face['ANGRY']}}</td>
+                    </tr>
+                    <tr>
+                        <td>CONFUSED</td>
+                        <td>{{face['CONFUSED']}}</td>
+                    </tr>
+                    <tr>
+                        <td>SAD</td>
+                        <td>{{face['SAD']}}</td>
+                    </tr>
+                    <tr>
+                        <td>DISGUSTED</td>
+                        <td>{{face['DISGUSTED']}}</td>
+                    </tr>
+                    <tr>
+                        <td>SURPRISED</td>
+                        <td>{{face['SURPRISED']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Brightness</td>
+                        <td>{{face['Brightness']}}</td>
+                    </tr>
+                    <tr>
+                        <td>Sharpness</td>
+                        <td>{{face['Sharpness']}}</td>
+                    </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+
     </div>
 
 {%endblock%}

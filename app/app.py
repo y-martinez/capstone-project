@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 
-import boto3
-from flask import Flask, render_template, request,redirect,flash,url_for
+import boto3,json
+from flask import Flask, render_template, request,redirect,flash,session,url_for
 from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 FEATURES_BLACKLIST = ("Landmarks", "Emotions", "Pose", "Quality", "BoundingBox", "Confidence","AgeRange")
 
+#TODO: Change to factories flask and helpers file
 app = Flask(__name__)
 app.config.from_object('config')
 
 # Connect to the s3 service
-rekognition = boto3.client("rekognition", app.config["AWS_REGION"])
+rekognition = boto3.client("rekognition",
+    aws_access_key_id=app.config["S3_KEY"],
+    aws_secret_access_key=app.config["S3_SECRET"],
+    region_name=app.config["AWS_REGION"])
+
 s3 = boto3.client(
     "s3",
     aws_access_key_id=app.config["S3_KEY"],
-    aws_secret_access_key=app.config["S3_SECRET"]
+    aws_secret_access_key=app.config["S3_SECRET"],
+    region_name=app.config["AWS_REGION"]
 )
 
 def allowed_files(filename):
@@ -52,27 +58,33 @@ def detect_faces(file,bucket, attributes=['ALL']):
         },
         Attributes=attributes,
     )
-    result = ""
+    result = '['
     for face in response['FaceDetails']:
-        result += "  Face {Confidence}%\n".format(**face)
-        result += "  Age : {Low} to {High} years\n".format(**face['AgeRange'])
+        result += '{'
+        result +=  '"Face" : "{Confidence}%",'.format(**face)
+        result += '"Age" : "{Low} to {High} years",'.format(**face['AgeRange'])
         # emotions
         for emotion in face['Emotions']:
-            result += "  {Type} : {Confidence}%\n".format(**emotion)
+            result += '"{Type}" : "{Confidence}%",'.format(**emotion)
         # quality
         for quality, value in face['Quality'].items():
-            result += "  {quality} : {value}\n".format(quality=quality, value=value)
+            result += '"{quality}" : "{value}",'.format(quality=quality, value=value)
         # facial features
         for feature, data in face.items():
             if feature not in FEATURES_BLACKLIST:
-                result += "  {feature}({data[Value]}) : {data[Confidence]}%\n".format(feature=feature, data=data)
+                result += '"{feature}({data[Value]})" : "{data[Confidence]}%",'.format(feature=feature, data=data)
+        result=result[:-1]
+        result +='},'
 
-    result +="\n\n"
+    result=result[:-1]
+    result +=']'
     return result
 
 @app.route('/result')
 def result():
-    return render_template('result.html')
+    output =json.loads(session['output'])
+    analized = json.loads(output['analized'])
+    return render_template('result.html',img=output['img'],faces_analized=analized)
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -97,9 +109,10 @@ def upload():
             'img':file_uploaded,
             'analized':file_analized
         }
-        
+        session['output'] = json.dumps(output)
+
         flash(message="Success image analized",category="success")
-        return render_template('result.html',out=output)
+        return redirect(url_for('result'))
 
     flash(message="An error ocurred",category="error")
     return redirect(url_for('index'))
