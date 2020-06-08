@@ -37,8 +37,8 @@ pipeline {
     stage('Publish docker') {
       steps {
         script {
-          docker.withRegistry('', dockerhubCredentials) {
-            app.push("${env.GIT_COMMIT}")
+          docker.withRegistry('https://registry.hub.docker.com', dockerhubCredentials) {
+            app.push("${env.BUILD_NUMBER}")
             app.push("latest")
           }
         }
