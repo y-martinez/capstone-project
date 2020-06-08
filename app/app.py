@@ -7,7 +7,6 @@ from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 FEATURES_BLACKLIST = ("Landmarks", "Emotions", "Pose", "Quality", "BoundingBox", "Confidence","AgeRange")
 
-#TODO: Change to factories flask and helpers file
 app = Flask(__name__)
 app.config.from_object('config')
 
@@ -29,25 +28,20 @@ def allowed_files(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def upload_file_to_s3(file,bucket,acl="public-read"):
-    try:
 
-        s3.upload_fileobj(
-            file,
-            bucket,
-            file.filename,
-            ExtraArgs={
-                "ACL": acl,
-                "ContentType": file.content_type
-            }
-        )
-
-    except Exception as e:
-        print("Something Happened: ", e)
-        return e
+    s3.upload_fileobj(
+        file,
+        bucket,
+        file.filename,
+        ExtraArgs={
+            "ACL": acl,
+            "ContentType": file.content_type
+        }
+    )
 
     return "{}{}".format(app.config["S3_LOCATION"], file.filename)
 
-def detect_faces(file,bucket, attributes=['ALL']):
+def detect_faces(file,bucket):
 
     response = rekognition.detect_faces(
         Image={
@@ -56,7 +50,7 @@ def detect_faces(file,bucket, attributes=['ALL']):
                 "Name": file.filename,
             }
         },
-        Attributes=attributes,
+        Attributes=['ALL'],
     )
     result = '['
     for face in response['FaceDetails']:
@@ -81,7 +75,7 @@ def detect_faces(file,bucket, attributes=['ALL']):
     return result
 
 @app.route('/result')
-def result():
+def results():
     output =json.loads(session['output'])
     analized = json.loads(output['analized'])
     return render_template('result.html',img=output['img'],faces_analized=analized)
@@ -112,7 +106,7 @@ def upload():
         session['output'] = json.dumps(output)
 
         flash(message="Success image analized",category="success")
-        return redirect(url_for('result'))
+        return redirect(url_for('results'))
 
     flash(message="An error ocurred",category="error")
     return redirect(url_for('index'))
