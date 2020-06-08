@@ -92,7 +92,6 @@ Resources:
               mv hadolint-Linux-x86_64 /usr/bin/hadolint
               chmod 775 /usr/bin/hadolint
 
-
               echo "Installing docker, kubernetes"
               curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
               curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
@@ -121,6 +120,7 @@ Resources:
 
               echo "Exporting the default Jenkins' password"
               #cp /var/lib/jenkins/secrets/initialAdminPassword /home/ubuntu && chown ubuntu:ubuntu /home/ubuntu/initialAdminPassword
+              usermod -aG docker jenkins
 
               echo "Installing aws-cli"
               curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"

@@ -1,0 +1,26 @@
+Description: >
+  Ybrahin Martinez - EKS in AWS
+
+Parameters:
+
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+
+Resources:
+  Cluster:
+    Type: 'AWS::EKS::Cluster'
+    Properties:
+      Name: !Sub ${EnvironmentName}-EKS-CLUSTER
+      RoleArn:
+        Fn::ImportValue:
+          !Sub ${EnvironmentName}-JenkinsRol
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - Fn::ImportValue:
+              !Sub ${EnvironmentName}-EKS-SG
+        SubnetIds:
+          Fn::Split:
+            - ","
+            - Fn::ImportValue:
+                !Sub ${EnvironmentName}-PUBLIC-NETS

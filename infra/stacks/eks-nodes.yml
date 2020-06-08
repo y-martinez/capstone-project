@@ -1,0 +1,29 @@
+Description: >
+  Ybrahin Martinez - EKS in AWS
+
+Parameters:
+
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+
+Resources:
+  EKSNodegroup:
+    Type: 'AWS::EKS::Nodegroup'
+    Properties:
+      ClusterName: !Sub ${EnvironmentName}-EKS-CLUSTER
+      NodeRole:
+        Fn::ImportValue:
+          !Sub ${EnvironmentName}-JenkinsRol
+      ScalingConfig:
+        MinSize: 1
+        DesiredSize: 1
+        MaxSize: 3
+      Labels:
+        Project: !Sub ${EnvironmentName}-EKS-CLUSTER
+        NodeType: Default
+      Subnets:
+        Fn::Split:
+          - ","
+          - Fn::ImportValue:
+              !Sub ${EnvironmentName}-PUBLIC-NETS
