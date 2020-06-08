@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    docker-hub-credentials = 'docker-hub-credentials'
+    dockerhubCredentials = 'docker-hub-credentials'
   }
 
   stages {
@@ -37,13 +37,12 @@ pipeline {
     stage('Publish docker') {
       steps {
         script {
-          docker.withRegistry('', docker-hub-credentials) {
+          docker.withRegistry('', dockerhubCredentials) {
             app.push("${env.GIT_COMMIT}")
             app.push("latest")
           }
         }
       }
     }
-
   }
 }
