@@ -112,10 +112,13 @@ def upload():
     return redirect(url_for('index'))
 
 
-@app.route('/',methods=["GET"])
-def index():
+@app.route('/analize',methods=["GET"])
+def analize():
     return render_template('index.html')
 
+@app.route('/',methods=["GET"])
+def index():
+    return 'Hello, World!'
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=app.config['PORT'], debug=app.config['DEBUG'])
