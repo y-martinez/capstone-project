@@ -47,8 +47,15 @@ pipeline {
 
     stage('Deploy to Kubernetes') {
         steps {
-            sh '"Setup Kubernetes Cluster"'
-            sh "aws eks --region us-west-2 update-kubeconfig --name UdacityFinalProject-EKS-CLUSTER"
+            retry(3) {
+                withAWS(region:'us-west-2',credentials:'aws-credentials-udacity') {
+                    sh 'echo "Setup Kubernetes Cluster"'
+                    sh "aws eks --region us-west-2 update-kubeconfig --name UdacityFinalProject-EKS-CLUSTER"
+                    sh 'echo "Deploying to Kubernetes"'
+                    sh 'sed -ie "s/latest/${GIT_COMMIT}/g" kubernetes/deployment.yml'
+                    sh "kubectl apply -f kubernetes/deployment.yml"
+                }
+            }
         }
     }
   }
