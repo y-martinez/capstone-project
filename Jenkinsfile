@@ -22,7 +22,7 @@ pipeline {
     stage('Build docker') {
       steps {
         script {
-          app = docker.build("project-final-udacity")
+          app = docker.build("ybrahinmartinez/project-final-udacity")
         }
 
       }
@@ -38,7 +38,7 @@ pipeline {
       steps {
         script {
           docker.withRegistry('', dockerhubCredentials) {
-            app.push("${env.GIT_COMMIT}")
+            app.push("${env.BUILD_NUMBER}")
             app.push("latest")
           }
         }
