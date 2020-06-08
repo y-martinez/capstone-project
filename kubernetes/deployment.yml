@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: UdacityFinalProject-EKS-CLUSTER
+  labels:
+    app: UdacityFinalProject-EKS-CLUSTER
+spec:
+  selector:
+    matchLabels:
+      app: UdacityFinalProject-EKS-CLUSTER
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: UdacityFinalProject-EKS-CLUSTER
+    spec:
+      containers:
+      - name: UdacityFinalProject-EKS-CLUSTER
+        image: ybrahinmartinez/project-final-udacity:latest
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8000
