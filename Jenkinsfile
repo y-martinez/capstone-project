@@ -1,10 +1,11 @@
 pipeline {
     agent any
     stages {
+
         stage('Install dependencies') {
             steps {
                 sh 'python3 -m venv venv'
-                sh '. venv/bin/activate && make install'
+                sh 'source venv/bin/activate && make install'
             }
         }
 
