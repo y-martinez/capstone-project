@@ -37,7 +37,7 @@ pipeline {
     stage('Publish docker') {
       steps {
         script {
-          docker.withRegistry('https://registry.hub.docker.com', dockerhubCredentials) {
+          docker.withRegistry('', dockerhubCredentials) {
             app.push("${env.BUILD_NUMBER}")
             app.push("latest")
           }
