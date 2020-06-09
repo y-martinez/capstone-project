@@ -10,6 +10,7 @@ FEATURES_BLACKLIST = ("Landmarks", "Emotions", "Pose", "Quality", "BoundingBox",
 app = Flask(__name__)
 app.config.from_object('config')
 
+#TODO: Test the linter
 # Connect to the s3 service
 rekognition = boto3.client("rekognition",
     aws_access_key_id=app.config["S3_KEY"],
@@ -70,13 +71,13 @@ def detect_faces(file,bucket):
         result=result[:-1]
         result +='},'
 
-result=result[:-1]
+    result=result[:-1]
     result +=']'
     return result
 
 @app.route('/result')
 def results():
-output =json.loads(session['output'])
+ output =json.loads(session['output'])
     analized = json.loads(output['analized'])
     return render_template('result.html',img=output['img'],faces_analized=analized)
 
