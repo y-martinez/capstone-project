@@ -118,7 +118,7 @@ def analize():
 
 @app.route('/',methods=["GET"])
 def index():
-    return '<h1>Hello, Udacity! this is my final Capstone project</h1>'
+    return '<h1>Hello, Udacity! this is my Capstone Project for the DevOps NanoDegree</h1>'
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=app.config['PORT'], debug=app.config['DEBUG'])
