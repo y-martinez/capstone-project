@@ -10,7 +10,7 @@ dockerpath=ybrahinmartinez/project-final-udacity
 # Authenticate & tag
 echo "Docker ID and Image: $dockerpath"
 docker login --username=ybrahinmartinez
-docker tag project-microservices-udacity:latest ${dockerpath}:latest
+docker tag project-final-udacity:latest ${dockerpath}:latest
 
 # Step 3:
 # Push image to a docker repository

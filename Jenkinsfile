@@ -40,7 +40,7 @@ pipeline {
         steps {
             script {
                 docker.withRegistry('', dockerhubCredentials) {
-                    app.push("${env.BUILD_NUMBER}")
+                    app.push("${env.GIT_COMMIT}")
                     app.push("latest")
                 }
             }
