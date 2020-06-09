@@ -56,7 +56,7 @@ pipeline {
                     sh 'echo "Deploying to Kubernetes"'
                     sh "kubectl apply -f kubernetes/aws-auth-cm.yaml"
                     sh "kubectl set image deployments/capstone capstone=ybrahinmartinez/project-final-udacity:latest"
-                    
+                    sh 'sed -ie "s/latest/${GIT_COMMIT}/g" kubernetes/deployment.yml'
                     sh "kubectl apply -f kubernetes/deployment.yml"
                     sh 'echo "Showing the result of deployment"'
                     sh "kubectl get svc"
