@@ -30,7 +30,7 @@ pipeline {
 
     stage('Scan image') {
       steps {
-        aquaMicroscanner(imageName: 'project-final-udacity', notCompliesCmd: 'exit 4', onDisallowed: 'ignore', outputFormat: 'html')
+        aquaMicroscanner(imageName: 'ybrahinmartinez/project-final-udacity', notCompliesCmd: 'exit 4', onDisallowed: 'ignore', outputFormat: 'html')
       }
     }
 
