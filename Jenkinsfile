@@ -1,3 +1,5 @@
+def serviceAddress = ""
+
 pipeline {
   agent any
 
@@ -6,43 +8,43 @@ pipeline {
   }
 
   stages {
+
     stage('Install dependencies') {
-      steps {
-        sh 'python3 -m venv venv'
-        sh '. venv/bin/activate && make install'
-      }
+        steps {
+            sh 'python3 -m venv venv'
+            sh '. venv/bin/activate && make install'
+        }
     }
 
     stage('Lint') {
-      steps {
-        sh '. venv/bin/activate && make lint'
-      }
+        steps {
+            sh '. venv/bin/activate && make lint'
+        }
     }
 
     stage('Build docker') {
-      steps {
-        script {
-          app = docker.build("ybrahinmartinez/project-final-udacity")
+        steps {
+            script {
+                app = docker.build("ybrahinmartinez/project-final-udacity")
+            }
         }
-
-      }
     }
 
     stage('Scan image') {
-      steps {
-        aquaMicroscanner(imageName: 'ybrahinmartinez/project-final-udacity', notCompliesCmd: 'exit 4', onDisallowed: 'ignore', outputFormat: 'html')
-      }
+        steps {
+            aquaMicroscanner(imageName: 'ybrahinmartinez/project-final-udacity', notCompliesCmd: 'exit 4', onDisallowed: 'ignore', outputFormat: 'html')
+        }
     }
 
     stage('Publish docker') {
-      steps {
-        script {
-          docker.withRegistry('', dockerhubCredentials) {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-          }
+        steps {
+            script {
+                docker.withRegistry('', dockerhubCredentials) {
+                    app.push("${env.BUILD_NUMBER}")
+                    app.push("latest")
+                }
+            }
         }
-      }
     }
 
     stage('Deploy to Kubernetes') {
@@ -54,8 +56,22 @@ pipeline {
                     sh 'echo "Deploying to Kubernetes"'
                     sh "kubectl apply -f kubernetes/aws-auth-cm.yaml"
                     sh "kubectl apply -f kubernetes/deployment.yml"
+                    sh 'echo "Showing the result of deployment"'
+                    sh "kubectl get svc"
+                    sh "kubectl get pods -o wide"
+                    script{
+                        serviceAddress = sh(script: "~/bin/kubectl get services --output=json | jq -r '.items[0] | .status.loadBalancer.ingress[0].hostname'", returnStdout: true).trim()
+                    }
+                    sh "echo 'Deployment Complete!'"
+				    sh "echo 'View Page Here (Please Allow a Minute for Services to Refresh): http://$serviceAddress:8000'"
                 }
             }
+        }
+    }
+    stage("Cleaning up") {
+        steps {
+            sh 'echo "Cleaning up..."'
+            sh "docker system prune"
         }
     }
   }
