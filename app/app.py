@@ -77,7 +77,7 @@ def detect_faces(file,bucket):
 
 @app.route('/result')
 def results():
- output =json.loads(session['output'])
+    output =json.loads(session['output'])
     analized = json.loads(output['analized'])
     return render_template('result.html',img=output['img'],faces_analized=analized)
 
