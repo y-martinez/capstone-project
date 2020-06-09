@@ -52,6 +52,7 @@ pipeline {
                     sh 'echo "Setup Kubernetes Cluster"'
                     sh "aws eks --region us-west-2 update-kubeconfig --name UdacityFinalProject-EKS-CLUSTER"
                     sh 'echo "Deploying to Kubernetes"'
+                    sh "kubectl apply -f kubernetes/aws-auth-cm.yaml"
                     sh "kubectl apply -f kubernetes/deployment.yml"
                 }
             }
