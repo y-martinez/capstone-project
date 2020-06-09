@@ -118,7 +118,7 @@ def analize():
 
 @app.route('/',methods=["GET"])
 def index():
-    return 'Hello, World!'
+    return '<h1>Hello, Udacity! this is my final Capstone project</h1>'
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=app.config['PORT'], debug=app.config['DEBUG'])
