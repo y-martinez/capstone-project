@@ -55,6 +55,8 @@ pipeline {
                     sh "aws eks --region us-west-2 update-kubeconfig --name UdacityFinalProject-EKS-CLUSTER"
                     sh 'echo "Deploying to Kubernetes"'
                     sh "kubectl apply -f kubernetes/aws-auth-cm.yaml"
+                    sh "kubectl set image deployments/capstone capstone=ybrahinmartinez/project-final-udacity:latest"
+                    
                     sh "kubectl apply -f kubernetes/deployment.yml"
                     sh 'echo "Showing the result of deployment"'
                     sh "kubectl get svc"
