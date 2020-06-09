@@ -92,6 +92,9 @@ You can find a detailed [project rubric, here](https://review.udacity.com/#!/rub
 - `outputs/capstone7-2.png` show successfully push docker hub(Part2)
 - `outputs/capstone8.png` show successfully push to  EKS cluster
 - `outputs/capstone9.png` show successfully the page with ELB running without problems
+- `outputs/capstone10.png` show successfully new deploy to show the Rolling Deployment method - Creathing/Starting new pods
+- `outputs/capstone11.png` show the new pods created and running successfully
+- `outputs/capstone12.png` show two versions of application, modify using Rolling Deployment
 
 > ### Docker:
 
