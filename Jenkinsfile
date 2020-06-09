@@ -60,7 +60,7 @@ pipeline {
                     sh "kubectl get svc"
                     sh "kubectl get pods -o wide"
                     script{
-                        serviceAddress = sh(script: "~/bin/kubectl get services --output=json | jq -r '.items[0] | .status.loadBalancer.ingress[0].hostname'", returnStdout: true).trim()
+                        serviceAddress = sh(script: "kubectl get svc --output=json | jq -r '.items[0] | .status.loadBalancer.ingress[0].hostname'", returnStdout: true).trim()
                     }
                     sh "echo 'Deployment Complete!'"
 				    sh "echo 'View Page Here (Please Allow a Minute for Services to Refresh): http://$serviceAddress:8000'"
