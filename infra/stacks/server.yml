@@ -101,20 +101,23 @@ Resources:
                 $(lsb_release -cs) \
                 stable"
 
-              echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-
               apt-get update
-              apt-get install -y docker-ce docker-ce-cli containerd.io kubectl
+              apt-get install -y docker-ce docker-ce-cli containerd.io
               usermod -aG docker ubuntu
               systemctl service docker start
               
+              curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.16.8/2020-04-16/bin/linux/amd64/kubectl
+              chmod +x ./kubectl
+              mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+              echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+
               echo "Installing docker-compose"
               curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
               
               echo "Installing Jenkins"
-              wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-              sh -c 'echo deb https://pkg.jenkins.io/debian binary/ > /etc/apt/sources.list.d/jenkins.list'
+              wget -q -O - https://pkg.Jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+              sh -c "echo 'deb https://pkg.jenkins.io/debian-stable binary/' > /etc/apt/sources.list.d/jenkins.list"
               apt-get update
               apt-get install -y jenkins
 

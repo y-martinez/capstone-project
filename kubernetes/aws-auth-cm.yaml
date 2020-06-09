@@ -4,9 +4,8 @@ metadata:
   name: aws-auth
   namespace: kube-system
 data:
-  mapRoles: |
-    - rolearn: arn:aws:iam::636999724661:role/UdacityFinalProject-Role
-      username: system:node:{{EC2PrivateDNSName}}
+  mapUsers: |
+    - userarn: arn:aws:iam::636999724661:user/jenkins
+      username: jenkins
       groups:
-        - system:bootstrappers
-        - system:nodes
+        - system:masters

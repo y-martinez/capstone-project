@@ -14,7 +14,7 @@ Resources:
       Name: !Sub ${EnvironmentName}-EKS-CLUSTER
       RoleArn:
         Fn::ImportValue:
-          !Sub ${EnvironmentName}-JenkinsRol
+          !Sub ${EnvironmentName}-ClusterRole
       ResourcesVpcConfig:
         SecurityGroupIds:
           - Fn::ImportValue:

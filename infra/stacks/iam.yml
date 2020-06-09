@@ -33,7 +33,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-        
+
   JenkinsGroup:
     Type: AWS::IAM::Group
     Properties:
@@ -41,26 +41,55 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonVPCFullAccess
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
 
-  UserRole:
+  JenkinsUserRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${EnvironmentName}-Role
+      RoleName: !Sub ${EnvironmentName}-Jenkins-Role
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
           Principal:
             Service:
             - ec2.amazonaws.com
-            - eks.amazonaws.com
           Action:
           - sts:AssumeRole
+      Path: "/"
+
+  ClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${EnvironmentName}-EKS-Role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - eks.amazonaws.com
+            Action:
+              - sts:AssumeRole
       Path: "/"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
         - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
         - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+
+  EKSNodegroupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${EnvironmentName}-EKS-Nodes-Role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
@@ -86,7 +115,7 @@ Resources:
       Groups:
         - !Ref JenkinsGroup
       Roles:
-        - !Ref UserRole
+        - !Ref JenkinsUserRole
       Users:
         - !Ref JenkinsUser
 
@@ -102,7 +131,7 @@ Resources:
     Properties:
       Path: "/"
       Roles:
-      - !Ref UserRole
+      - !Ref JenkinsUserRole
 
   Keys:
     Type: AWS::IAM::AccessKey
@@ -112,10 +141,22 @@ Resources:
 Outputs:
 
   JenkinsRol:
-    Description: Jenikins Rol
-    Value: !GetAtt UserRole.Arn
+    Description: Jenikins Role
+    Value: !GetAtt JenkinsUserRole.Arn
     Export:
-      Name: !Sub ${EnvironmentName}-JenkinsRol
+      Name: !Sub ${EnvironmentName}-JenkinsRole
+
+  ClusterRol:
+    Description: Cluster Role
+    Value: !GetAtt ClusterRole.Arn
+    Export:
+      Name: !Sub ${EnvironmentName}-ClusterRole
+
+  NodesRol:
+    Description: EKS Nodes Role
+    Value: !GetAtt EKSNodegroupRole.Arn
+    Export:
+      Name: !Sub ${EnvironmentName}-EKSNodegroupRole
 
   InstanceProfile:
     Description: Instance profile of Rol
