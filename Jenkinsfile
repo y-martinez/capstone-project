@@ -16,7 +16,7 @@ pipeline {
         }
     }
 
-    stage('Lint') {
+    stage('Lint with pylint and hadolint') {
         steps {
             sh '. venv/bin/activate && make lint'
         }
@@ -30,13 +30,13 @@ pipeline {
         }
     }
 
-    stage('Scan image') {
+    stage('Scan image with Aqua') {
         steps {
             aquaMicroscanner(imageName: 'ybrahinmartinez/project-final-udacity', notCompliesCmd: 'exit 4', onDisallowed: 'ignore', outputFormat: 'html')
         }
     }
 
-    stage('Publish docker') {
+    stage('Publish docker to Dockerhub') {
         steps {
             script {
                 docker.withRegistry('', dockerhubCredentials) {
@@ -47,7 +47,7 @@ pipeline {
         }
     }
 
-    stage('Deploy to Kubernetes') {
+    stage('Deploy to Kubernetes (EKS Cluster)') {
         steps {
             retry(3) {
                 withAWS(credentials: 'aws-credentials-udacity', region: 'us-west-2') {
@@ -71,7 +71,7 @@ pipeline {
     stage("Cleaning up") {
         steps {
             sh 'echo "Cleaning up..."'
-            sh "docker system prune"
+            sh "docker system prune -f"
         }
     }
   }
