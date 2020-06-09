@@ -2,27 +2,41 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: UdacityFinalProject-EKS-CLUSTER
+  name: capstone
   labels:
-    app: UdacityFinalProject-EKS-CLUSTER
+    app: capstone
+  namespace: default
 spec:
   selector:
     matchLabels:
-      app: UdacityFinalProject-EKS-CLUSTER
-  replicas: 2
+      app: capstone
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 50%
-      maxSurge: 1
+      maxUnavailable: 25%
+      maxSurge: 25%
   template:
     metadata:
       labels:
-        app: UdacityFinalProject-EKS-CLUSTER
+        app: capstone
     spec:
       containers:
-      - name: UdacityFinalProject-EKS-CLUSTER
+      - name: capstone
         image: ybrahinmartinez/project-final-udacity:latest
         imagePullPolicy: "Always"
         ports:
         - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: capstone
+spec:
+  selector:
+    app: capstone
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000

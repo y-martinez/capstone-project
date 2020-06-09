@@ -26,7 +26,14 @@ Resources:
       LoginProfile:
         Password: "UserJenkins"
         PasswordResetRequired: true
-
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        
   JenkinsGroup:
     Type: AWS::IAM::Group
     Properties:
@@ -80,6 +87,8 @@ Resources:
         - !Ref JenkinsGroup
       Roles:
         - !Ref UserRole
+      Users:
+        - !Ref JenkinsUser
 
   AddUserGroup:
     Type: AWS::IAM::UserToGroupAddition
