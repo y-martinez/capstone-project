@@ -81,7 +81,17 @@ You can find a detailed [project rubric, here](https://review.udacity.com/#!/rub
 
 > ### Outputs:
 
-- `output`  folder with screenshots
+- `outputs`  folder with screenshots
+- `outputs/capstone1.png` show the stacks successfully deployed with CloudFormation
+- `outputs/capstone2.png` show the fail linter hadolint
+- `outputs/capstone3.png` show the fail linter pylint(Errors)
+- `outputs/capstone4.png` show the fail linter pylint(Warnings)
+- `outputs/capstone5.png` show successfully linter pass with 10/10
+- `outputs/capstone6.png` show successfully build docker images
+- `outputs/capstone7-1.png` show successfully push docker hub(Part1)
+- `outputs/capstone7-2.png` show successfully push docker hub(Part2)
+- `outputs/capstone8.png` show successfully push to  EKS cluster
+- `outputs/capstone9.png` show successfully the page with ELB running without problems
 
 > ### Docker:
 
@@ -152,5 +162,5 @@ utils/create-stack.sh eks-nodes-stack infra/stacks/eks-nodes.yml infra/parameter
 
 Now you can access to Jenkins to deploy using the pipeline.
 
-You can access the demo using this [link](http://a18906511296b4a958d3159f5201a8cb-358484628.us-west-2.elb.amazonaws.com:8000/) 
+You can access the demo using this [link](http://ab61939fd7bf446139fc1752a884b09f-308296604.us-west-2.elb.amazonaws.com:8000/) 
 
