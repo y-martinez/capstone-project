@@ -10,7 +10,6 @@ FEATURES_BLACKLIST = ("Landmarks", "Emotions", "Pose", "Quality", "BoundingBox",
 app = Flask(__name__)
 app.config.from_object('config')
 
-#TODO: Test the linter
 # Connect to the s3 service
 rekognition = boto3.client("rekognition",
     aws_access_key_id=app.config["S3_KEY"],
